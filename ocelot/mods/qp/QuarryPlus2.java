@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2012,2013 yogpstop: Updated by Werl and Snipe
- * This program is free software: you can
- * redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version. This program is
- * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details. You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2012,2013 yogpstop: Updated by Werl and Snipe This program is
+ * free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details. You should have received a copy of the GNU Lesser General
+ * Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 
 package ocelot.mods.qp;
@@ -60,6 +60,8 @@ public class QuarryPlus2
 
 	public static int			quarryMaxSize;
 
+	public static String[]		ignoreIds;
+
 	public static Field			redstoneChipsetF	= null;
 	static
 	{
@@ -82,11 +84,7 @@ public class QuarryPlus2
 	public static final int		guiIdFList			= 3;
 	public static final int		guiIdSList			= 4;
 	public static final int		guiIdPlacer			= 5;
-	public static final int		guiIdPump			= 6;																												// reserved
-																																										// from
-																																										// 6
-																																										// to
-																																										// 11
+	public static final int		guiIdPump			= 6;	//reserved from 6 to 11
 	public static final int		guiIdQuarry			= 12;
 
 	@ForgeSubscribe
@@ -114,10 +112,13 @@ public class QuarryPlus2
 					cfg.getBlock("Refinery", 1976).getInt(), cfg.getBlock("Placer", 1977).getInt(), cfg.getBlock("Breaker", 1978).getInt(), cfg.getBlock("Laser", 1979).getInt() };
 			iid = cfg.getItem("Tools", 18463).getInt();
 
-			Property RD;
-			RD = cfg.get(cfg.CATEGORY_GENERAL, "max_quarry", 256);
-			RD.comment = "Max size the quarry can be in blocks. Chose a distance between 16 (1 chunk) and 512 (32 chunks). Default is 256 (16 chunks)";
-			quarryMaxSize = RD.getInt();
+			Property prop;
+			prop = cfg.get(cfg.CATEGORY_GENERAL, "max_quarry", 256);
+			prop.comment = "Max size the quarry can be in blocks. Chose a distance between 16 (1 chunk) and 512 (32 chunks). Default is 256 (16 chunks)";
+			quarryMaxSize = prop.getInt();
+
+			prop = cfg.get(cfg.CATEGORY_GENERAL, "ignore_blacks", new String[] { "" });
+			prop.comment = "Blocks for the quarry to ignore, colon to seperate";
 
 			if (quarryMaxSize < 16)
 				quarryMaxSize = 16;
@@ -263,26 +264,5 @@ public class QuarryPlus2
 	public static long data(short id, int meta)
 	{
 		return id | (meta << 12);
-	}
-
-	public static CreativeTabs	ct	= null;
-	static
-	{
-		final Class ctc = buildcraft.core.CreativeTabBuildCraft.class;
-		try
-		{
-			ct = (CreativeTabs) ctc.getField("tabBuildCraft").get(null);
-		}
-		catch (Exception e)
-		{}
-		if (ct == null)
-		{
-			try
-			{
-				ct = (CreativeTabs) ctc.getMethod("get", new Class[] {}).invoke(ctc.getField("MACHINES").get(null), new Object[] {});
-			}
-			catch (Exception e)
-			{}
-		}
 	}
 }

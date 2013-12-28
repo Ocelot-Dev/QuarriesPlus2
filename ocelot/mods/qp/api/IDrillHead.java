@@ -17,6 +17,9 @@
 
 package ocelot.mods.qp.api;
 
+import net.minecraft.block.Block;
+import net.minecraft.world.World;
+
 public interface IDrillHead
 {
 	public float drillSpeed();
@@ -28,14 +31,10 @@ public interface IDrillHead
 	public int maxUses();
 	
 	public int usesLeft();
+
+	public BlockBreak tryBreakBlock(Block block, World world, int x, int y, int z);
 	
-	public byte efficencyEnchant();
-	
-	public byte unbreakingEnchant();
-	
-	public byte fortuneEnchant();
-	
-	public boolean silkEnchant();
+	public BlockBreak breakBlock(Block block, World world, int x, int y, int z);
 	
 	public String textureLocation();
 }

@@ -1,18 +1,14 @@
 /*
- * Copyright (C) 2012,2013 yogpstop: Updated by Werl and Snipe
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the
- * GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2012,2013 yogpstop: Updated by Werl and Snipe This program is
+ * free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details. You should have received a copy of the GNU Lesser General
+ * Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 
 package ocelot.mods.qp;
@@ -34,6 +30,7 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -48,26 +45,30 @@ import buildcraft.api.power.IPowerReceptor;
 import buildcraft.api.power.PowerHandler.PowerReceiver;
 import buildcraft.core.IMachine;
 
-public abstract class TileBasic extends APacketTile implements IPowerReceptor, IMachine, IEnchantableTile {
-	protected ForgeDirection pump = ForgeDirection.UNKNOWN;
+public abstract class TileBasic extends APacketTile implements IPowerReceptor, IMachine, ISidedInventory
+{
+	protected ForgeDirection		pump			= ForgeDirection.UNKNOWN;
 
-	protected PowerHandler pp = new PowerHandler(this, PowerHandler.Type.MACHINE);
+	protected PowerHandler			pp				= new PowerHandler(this, PowerHandler.Type.MACHINE);
 
-	public final List<Long> fortuneList = new ArrayList<Long>();
-	public final List<Long> silktouchList = new ArrayList<Long>();
-	public boolean fortuneInclude, silktouchInclude;
+	public final List<Long>			fortuneList		= new ArrayList<Long>();
+	public final List<Long>			silktouchList	= new ArrayList<Long>();
+	public boolean					fortuneInclude, silktouchInclude;
 
-	protected byte unbreaking;
-	protected byte fortune;
-	protected boolean silktouch;
-	protected byte efficiency;
+	protected byte					unbreaking;
+	protected byte					fortune;
+	protected boolean				silktouch;
+	protected byte					efficiency;
 
-	protected final List<ItemStack> cacheItems = new LinkedList<ItemStack>();
+	protected final List<ItemStack>	cacheItems		= new LinkedList<ItemStack>();
 
-	void sendOpenGUI(EntityPlayer ep, byte id) {
+	//Send packet for gui
+	void sendOpenGUI(EntityPlayer ep, byte id)
+	{
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
-		try {
+		try
+		{
 			dos.writeInt(this.xCoord);
 			dos.writeInt(this.yCoord);
 			dos.writeInt(this.zCoord);
@@ -77,15 +78,20 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 			dos.writeInt(target.size());
 			for (Long l : target)
 				dos.writeLong(l);
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 		PacketDispatcher.sendPacketToPlayer(composeTilePacket(bos), (Player) ep);
 	}
 
+	//Server Recieve Packet
 	@Override
-	protected void S_recievePacket(byte pattern, ByteArrayDataInput data, EntityPlayer ep) {
-		switch (pattern) {
+	protected void S_recievePacket(byte pattern, ByteArrayDataInput data, EntityPlayer ep)
+	{
+		switch (pattern)
+		{
 		case CtS_ADD_FORTUNE:
 			this.fortuneList.add(data.readLong());
 			sendOpenGUI(ep, StC_OPENGUI_FORTUNE);
@@ -118,25 +124,32 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 	protected abstract void G_destroy();
 
 	@Override
-	public final void invalidate() {
+	public final void invalidate()
+	{
 		G_destroy();
 		super.invalidate();
 	}
 
+	//Kinda Obvious
 	@Override
-	public final void onChunkUnload() {
+	public final void onChunkUnload()
+	{
 		G_destroy();
 		super.onChunkUnload();
 	}
 
+	//Client Recieve Packet
 	@Override
-	protected void C_recievePacket(byte pattern, ByteArrayDataInput data, EntityPlayer ep) {
-		switch (pattern) {
+	protected void C_recievePacket(byte pattern, ByteArrayDataInput data, EntityPlayer ep)
+	{
+		switch (pattern)
+		{
 		case StC_OPENGUI_FORTUNE:
 			this.fortuneInclude = data.readBoolean();
 			this.fortuneList.clear();
 			int fsize = data.readInt();
-			for (int i = 0; i < fsize; i++) {
+			for (int i = 0; i < fsize; i++)
+			{
 				this.fortuneList.add(data.readLong());
 			}
 			ep.openGui(QuarryPlus2.instance, QuarryPlus2.guiIdFList, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
@@ -145,7 +158,8 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 			this.silktouchInclude = data.readBoolean();
 			this.silktouchList.clear();
 			int ssize = data.readInt();
-			for (int i = 0; i < ssize; i++) {
+			for (int i = 0; i < ssize; i++)
+			{
 				this.silktouchList.add(data.readLong());
 			}
 			ep.openGui(QuarryPlus2.instance, QuarryPlus2.guiIdSList, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
@@ -153,12 +167,16 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 		}
 	}
 
-	protected boolean S_breakBlock(int x, int y, int z, PowerManager.BreakType t) {
+	// Break Block
+	protected boolean S_breakBlock(int x, int y, int z, PowerManager.BreakType t)
+	{
 		Collection<ItemStack> dropped = new LinkedList<ItemStack>();
 		Block b = Block.blocksList[this.worldObj.getBlockId(x, y, z)];
-		if (b instanceof IFluidBlock || b == Block.waterStill || b == Block.waterMoving || b == Block.lavaStill || b == Block.lavaMoving) {
+		if (b instanceof IFluidBlock || b == Block.waterStill || b == Block.waterMoving || b == Block.lavaStill || b == Block.lavaMoving)
+		{
 			TileEntity te = this.worldObj.getBlockTileEntity(this.xCoord + this.pump.offsetX, this.yCoord + this.pump.offsetY, this.zCoord + this.pump.offsetZ);
-			if (!(te instanceof TilePumpPlus)) {
+			if (!(te instanceof TilePumpPlus))
+			{
 				this.pump = ForgeDirection.UNKNOWN;
 				G_renew_powerConfigure();
 				return true;
@@ -173,7 +191,8 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 		return true;
 	}
 
-	boolean S_connect(ForgeDirection fd) {
+	boolean S_connect(ForgeDirection fd)
+	{
 		TileEntity te = this.worldObj.getBlockTileEntity(this.xCoord + this.pump.offsetX, this.yCoord + this.pump.offsetY, this.zCoord + this.pump.offsetZ);
 		if (te instanceof TilePumpPlus && this.pump != fd) return false;
 		this.pump = fd;
@@ -181,31 +200,43 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 		return true;
 	}
 
-	protected float S_blockHardness(int x, int y, int z) {
+	// Get Block Hardness
+	protected float S_blockHardness(int x, int y, int z)
+	{
 		Block b = Block.blocksList[this.worldObj.getBlockId(x, y, z)];
-		if (b != null) {
+		if (b != null)
+		{
 			if (this.worldObj.getBlockMaterial(x, y, z).isLiquid()) return 0;
 			return b.getBlockHardness(this.worldObj, x, y, z);
 		}
 		return 0;
 	}
 
-	private double S_addDroppedItems(Collection<ItemStack> list, int x, int y, int z, PowerManager.BreakType t) {
+	// Get energy required to break Blocks
+	private double S_addDroppedItems(Collection<ItemStack> list, int x, int y, int z, PowerManager.BreakType t)
+	{
 		Block b = Block.blocksList[this.worldObj.getBlockId(x, y, z)];
 		int meta = this.worldObj.getBlockMetadata(x, y, z);
 		if (b == null) return 1;
-		if (b.canSilkHarvest(this.worldObj, null, x, y, z, meta) && this.silktouch
-				&& (this.silktouchList.contains(data((short) b.blockID, meta)) == this.silktouchInclude)) {
-			try {
+		// test silk touch
+		if (b.canSilkHarvest(this.worldObj, null, x, y, z, meta) && this.silktouch && (this.silktouchList.contains(data((short) b.blockID, meta)) == this.silktouchInclude))
+		{
+			try
+			{
 				list.add((ItemStack) createStackedBlock.invoke(b, meta));
 				return t == PowerManager.BreakType.Quarry ? PowerManager.B_CS : PowerManager.W_CS;
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
-			} catch (Error e) {
+			}
+			catch (Error e)
+			{
 				e.printStackTrace();
 			}
 		}
-		if (this.fortuneList.contains(data((short) b.blockID, meta)) == this.fortuneInclude) {
+		if (this.fortuneList.contains(data((short) b.blockID, meta)) == this.fortuneInclude)
+		{
 			list.addAll(b.getBlockDropped(this.worldObj, x, y, z, meta, this.fortune));
 			return Math.pow(t == PowerManager.BreakType.Quarry ? PowerManager.B_CF : PowerManager.W_CF, this.fortune);
 		}
@@ -214,37 +245,48 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 	}
 
 	@Override
-	public final boolean manageFluids() {
+	public final boolean manageFluids()
+	{
 		return false;
 	}
 
 	@Override
-	public final boolean manageSolids() {
+	public final boolean manageSolids()
+	{
 		return true;
 	}
 
 	@Override
-	public final boolean allowAction(IAction action) {
+	public final boolean allowAction(IAction action)
+	{
 		return false;
 	}
 
 	@Override
-	public final PowerReceiver getPowerReceiver(ForgeDirection side) {
+	public final PowerReceiver getPowerReceiver(ForgeDirection side)
+	{
 		return this.pp.getPowerReceiver();
 	}
 
-	static final Method createStackedBlock;
+	static final Method	createStackedBlock;
 
-	static {
+	static
+	{
 		Method buf = null;
-		try {
+		try
+		{
 			buf = Block.class.getDeclaredMethod("func_71880_c_", int.class);
 			buf.setAccessible(true);
-		} catch (Exception e1) {
-			try {
+		}
+		catch (Exception e1)
+		{
+			try
+			{
 				buf = Block.class.getDeclaredMethod("createStackedBlock", int.class);
 				buf.setAccessible(true);
-			} catch (Exception e2) {
+			}
+			catch (Exception e2)
+			{
 				e1.printStackTrace();
 				e2.printStackTrace();
 				buf = null;
@@ -254,7 +296,8 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbttc) {
+	public void readFromNBT(NBTTagCompound nbttc)
+	{
 		super.readFromNBT(nbttc);
 		this.silktouch = nbttc.getBoolean("silktouch");
 		this.fortune = nbttc.getByte("fortune");
@@ -267,14 +310,16 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 		this.pp.readFromNBT(nbttc);
 	}
 
-	private static void readLongCollection(NBTTagList nbttl, Collection<Long> target) {
+	private static void readLongCollection(NBTTagList nbttl, Collection<Long> target)
+	{
 		target.clear();
 		for (int i = 0; i < nbttl.tagCount(); i++)
 			target.add(((NBTTagLong) nbttl.tagAt(i)).data);
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbttc) {
+	public void writeToNBT(NBTTagCompound nbttc)
+	{
 		super.writeToNBT(nbttc);
 		nbttc.setBoolean("silktouch", this.silktouch);
 		nbttc.setByte("fortune", this.fortune);
@@ -287,46 +332,38 @@ public abstract class TileBasic extends APacketTile implements IPowerReceptor, I
 		this.pp.writeToNBT(nbttc);
 	}
 
-	private static NBTTagList writeLongCollection(Collection<Long> target) {
+	private static NBTTagList writeLongCollection(Collection<Long> target)
+	{
 		NBTTagList nbttl = new NBTTagList();
 		for (Long l : target)
 			nbttl.appendTag(new NBTTagLong("", l));
 		return nbttl;
 	}
+	
+	public void G_reinit()
+	{}
 
 	@Override
-	public final void doWork(PowerHandler workProvider) {}
+	public final void doWork(PowerHandler workProvider)
+	{}
 
 	@Override
-	public World getWorld() {
+	public World getWorld()
+	{
 		return this.worldObj;
 	}
+	
+	@Override
+	public void openChest()
+	{}
 
 	@Override
-	public byte getEfficiency() {
-		return this.efficiency;
-	}
-
+	public void closeChest()
+	{}
+	
 	@Override
-	public byte getFortune() {
-		return this.fortune;
-	}
-
-	@Override
-	public byte getUnbreaking() {
-		return this.unbreaking;
-	}
-
-	@Override
-	public boolean getSilktouch() {
-		return this.silktouch;
-	}
-
-	@Override
-	public void set(byte pefficiency, byte pfortune, byte punbreaking, boolean psilktouch) {
-		this.efficiency = pefficiency;
-		this.fortune = pfortune;
-		this.unbreaking = punbreaking;
-		this.silktouch = psilktouch;
+	public int getInventoryStackLimit()
+	{
+		return 64;
 	}
 }

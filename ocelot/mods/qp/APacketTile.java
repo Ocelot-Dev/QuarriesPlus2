@@ -24,8 +24,21 @@ import net.minecraft.tileentity.TileEntity;
 import com.google.common.io.ByteArrayDataInput;
 
 public abstract class APacketTile extends TileEntity {
+	
+	/**
+	 * Packet Reader Server
+	 * @param pattern
+	 * @param data 
+	 * @param ep EntityPlayer
+	 */
 	abstract void S_recievePacket(byte pattern, ByteArrayDataInput data, EntityPlayer ep);
 
+	/**
+	 * Packet Reader Client
+	 * @param pattern
+	 * @param data
+	 * @param ep EntityPlayer
+	 */
 	abstract void C_recievePacket(byte pattern, ByteArrayDataInput data, EntityPlayer ep);
 
 	@Override

@@ -47,7 +47,6 @@ public class BlockQuarryPlus extends BlockContainer {
 		setHardness(1.5F);
 		setResistance(10F);
 		setStepSound(soundStoneFootstep);
-		setCreativeTab(QuarryPlus2.ct);
 		setUnlocalizedName("QuarryPlus");
 	}
 
@@ -63,7 +62,6 @@ public class BlockQuarryPlus extends BlockContainer {
 		if (id1 > 0) {
 			for (int i = 0; i < count; i++) {
 				ItemStack is = new ItemStack(id1, 1, damageDropped(meta));
-				EnchantmentHelper.enchantmentToIS(tile, is);
 				this.drop.add(is);
 			}
 		}

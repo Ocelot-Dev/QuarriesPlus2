@@ -43,7 +43,6 @@ public class BlockRefineryPlus extends BlockContainer {
 	public BlockRefineryPlus(int par1) {
 		super(par1, Material.iron);
 		setHardness(5F);
-		setCreativeTab(QuarryPlus2.ct);
 		setUnlocalizedName("RefineryPlus");
 	}
 
